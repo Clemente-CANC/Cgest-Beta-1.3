@@ -73,7 +73,7 @@ class Cgest:
                  sg.Button('Editar turma', border_width=0, size=(15, 1), key='-EditarTurma-', disabled=True)],
                 [sg.Text('Tutor da turma:'), sg.Text('Nenhum', key='-Tutor-', size=(100, 1))],
                 [sg.Text('')],
-                [sg.Text('Alunos Cadastrados'), sg.Text('Nenhum', size=(7, 1)),
+                [sg.Text('Alunos Cadastrados'), sg.Text('', size=(7, 1)),
                  sg.Text('Ordena por:'), sg.Combo(['Nome', 'Idade', 'Id', 'Data de inscrição'], default_value='Nome'),
                  sg.Text('Pesquisar:'),
                  sg.InputText('Pesquisar por nome do aluno', border_width=0)],
@@ -316,6 +316,12 @@ class Cgest:
                     else:
                         for c in turmas:
                                 if c[1] == values['-NDT-']:
+                                    for k in turmas:
+                                        if c[3] < k[3]:
+                                            update(definicoes[2], 'turmas', 'class', k[3]-1, 'ID', k[0])
+                                    for d in dados_dos_alunos:
+                                        if c[1] == d[5]:
+                                            elimar(definicoes[2], d[0], 'alunos')
                                     elimar(definicoes[2], c[0], 'turmas')
                                     turmas = abrir_Turmas(definicoes[2])
                                     break
@@ -328,6 +334,7 @@ class Cgest:
                             self.window['-CLASS-'].update(False)
                         else:
                             self.window['-CLASS-'].update(True)
+                            
 
                         
 

@@ -116,11 +116,18 @@ def criar_Tutor(banco_dados, nome, numero, sexo, aulas, detalhes, ID=1000):
     cursor.close()
     conexao.close()
 
-def elimar(banco_de_dados, id, table):
+def elimar(banco_de_dados, iden, table):
     conexao = sq.connect(banco_de_dados)
     curso = conexao.cursor()
-    curso.execute(f'delete from {table} where ID={id}')
+    curso.execute(f'delete from {table} where ID={iden}')
     conexao.commit()
     curso.close()
     conexao.close()
 
+def update(banco_de_dados, table, coluna, mude, Referencia, constante):
+    conexao = sq.connect(banco_de_dados)
+    curso = conexao.cursor()
+    curso.execute(f'update {table} set {coluna} = {mude} where {Referencia} = {constante}')
+    conexao.commit()
+    curso.close()
+    conexao.close()
