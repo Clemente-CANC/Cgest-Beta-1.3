@@ -115,3 +115,12 @@ def criar_Tutor(banco_dados, nome, numero, sexo, aulas, detalhes, ID=1000):
     conexao.commit()
     cursor.close()
     conexao.close()
+
+def elimar(banco_de_dados, id, table):
+    conexao = sq.connect(banco_de_dados)
+    curso = conexao.cursor()
+    curso.execute(f'delete from {table} where ID={id}')
+    conexao.commit()
+    curso.close()
+    conexao.close()
+
