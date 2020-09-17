@@ -258,16 +258,18 @@ class Cgest:
 
                 if botton == 'Adicionar uma turma':
                     if values['-EDT-']:
-                        sg.popup_quick_message('Por favor va para a opção ADICIONAR UMA TURMA', font='123 15')
-                        sleep(2)
+                        Cgest.message('Por favor va para a opção ADICIONAR UMA TURMA')
                     else:
                         cancela = 0
                         while cancela == 0:
                             for c in ID_Turmas(definicoes[2]):
+                                # Criando um id para turma.
                                 id = randint(1000, 9999)
+                                # Verificando se existe este id para na gerar erro no programa.
                                 if id != c[0]:
                                     if values['-NDT-'] not in [f[1] for f in ID_Turmas(definicoes[2])]:
                                         if values['-CLASS-']:
+                                            # Criando um turma apartir das informações introduzidas pelo usuário. 
                                             criar_Turma(definicoes[2], f'Nenhum nome definido {self.maior + 1}'
                                                         if values['-NDT-'] == ''
                                                         else values['-NDT-'], values['-TDT-'],
@@ -334,9 +336,7 @@ class Cgest:
                             self.window['-CLASS-'].update(False)
                         else:
                             self.window['-CLASS-'].update(True)
-                            
-
-                        
+                                                    
 
     class Alunos:
         def __init__(self):
