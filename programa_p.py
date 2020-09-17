@@ -339,6 +339,7 @@ class Cgest:
                             self.window['-CLASS-'].update(False)
                         else:
                             self.window['-CLASS-'].update(True)
+                elif botton == ''
                                                     
     class Alunos:
         def __init__(self):
