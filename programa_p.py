@@ -265,9 +265,11 @@ class Cgest:
                             for c in ID_Turmas(definicoes[2]):
                                 # Criando um id para turma.
                                 id = randint(1000, 9999)
-                                # Verificando se existe este id para na gerar erro no programa.
+                                # Verificando se existe um id parecido para não gerar erro no programa.
                                 if id != c[0]:
+                                    # Verificando se existe uma turma com o mesmo nome para não gerar erro no programa.
                                     if values['-NDT-'] not in [f[1] for f in ID_Turmas(definicoes[2])]:
+                                    # verificando se o usuário definiu a classificação da turma.
                                         if values['-CLASS-']:
                                             # Criando um turma apartir das informações introduzidas pelo usuário. 
                                             criar_Turma(definicoes[2], f'Nenhum nome definido {self.maior + 1}'
@@ -280,6 +282,7 @@ class Cgest:
                                                         else values['-NDT-'], data, id)
                                             cancela = 1
                                         elif not values['-CLASS-']:
+                                            # Criando um turma apartir das informações introduzidas pelo usuário.
                                             criar_Turma(definicoes[2],
                                                         f'Nenhum nome definido {self.maior + 1}'
                                                         if values['-NDT-'] == ''
@@ -292,12 +295,10 @@ class Cgest:
                                                         else values['-NDT-'], data, id)
                                             cancela = 1
                                             break
-
+                                    # Se já existir uma turma com o mesmo nome o programa dá-nos um mensagem.
                                     else:
                                         self.window['-NDT-'].update('')
-                                        sg.popup_quick_message('Esta turma já existe', font='123 15')
-
-                                        sleep(2)
+                                        Cgest.message('Esta turma já existe')
                                         cancela = 1
                                         break
                         turmas = abrir_Turmas(definicoes[2])
