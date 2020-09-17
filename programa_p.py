@@ -255,7 +255,7 @@ class Cgest:
                                     self.window['-CLASS-'].update(False)
                                 else:
                                     self.window['-CLASS-'].update(True)
-
+                # Opção para adicionar uma turma
                 if botton == 'Adicionar uma turma':
                     if values['-EDT-']:
                         Cgest.message('Por favor va para a opção ADICIONAR UMA TURMA')
@@ -313,6 +313,7 @@ class Cgest:
                                     self.maior = c[2]
                             cont += 1
                         self.window['-Num-'].update(values=[c for c in range(1, self.maior + 1)])
+                # Opção para elinminar uma turma.
                 elif botton == 'Eliminar Turma':
                     if values['-NDT-'] == '' or len(turmas[1:]) == 1:
                         Cgest.message('Nome não definido' if values['-NDT-'] == '' else 'Operação invalida')
@@ -320,6 +321,7 @@ class Cgest:
                         for c in turmas:
                                 if c[1] == values['-NDT-']:
                                     for k in turmas:
+                                        # Actulizar as classifições de todas as turmas.
                                         if c[3] < k[3]:
                                             update(definicoes[2], 'turmas', 'class', k[3]-1, 'ID', k[0])
                                     for d in dados_dos_alunos:
@@ -338,7 +340,6 @@ class Cgest:
                         else:
                             self.window['-CLASS-'].update(True)
                                                     
-
     class Alunos:
         def __init__(self):
             self.layout_1 = [
