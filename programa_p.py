@@ -339,7 +339,17 @@ class Cgest:
                             self.window['-CLASS-'].update(False)
                         else:
                             self.window['-CLASS-'].update(True)
-                elif botton == ''
+                elif botton == 'Editar': 
+                        for c in turmas:
+                            if values['-NDT-'] == c[1]:
+                                update(definicoes[2], 'turmas', 'tutor', 'nada', 'ID', c[0])
+                                update(definicoes[2], 'turmas', 'class', int(values['-CLASS-']) 
+                                if values['-CLASS-'] else c[3], 'ID', c[0])
+                                update(definicoes[2], 'turmas', 'detalhes', values['-DETALHE-'], 'ID', c[0])
+                                break
+
+                    
+
                                                     
     class Alunos:
         def __init__(self):
