@@ -127,7 +127,7 @@ def elimar(banco_de_dados, iden, table):
 def update(banco_de_dados, table, coluna, mude, Referencia, constante):
     conexao = sq.connect(banco_de_dados)
     curso = conexao.cursor()
-    curso.execute(f'update {table} set {coluna} = {mude} where {Referencia} = {constante}')
+    curso.execute(f'''update {table} set {coluna} = {mude} where {Referencia}={constante}''')
     conexao.commit()
     curso.close()
     conexao.close()
