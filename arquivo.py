@@ -1,4 +1,5 @@
 import sqlite3 as sq
+import pymysql as my
 import PySimpleGUI as sg
 from time import sleep
 from random import randint, choice
@@ -111,10 +112,11 @@ def criar_Tutor(banco_dados, nome, numero, sexo, aulas, detalhes, ID=1000):
     conexao = sq.connect(banco_dados)
     cursor = conexao.cursor()
     cursor.execute('''insert into tutor(ID, nome, numero, sexo, aulas, detalhes) values(?, ?, ?, ?, ?, ?)''',
-                   (ID, nome, numero, sexo, aulas, detalhes, ))
+                   (ID, nome, numero, sexo, aulas, detalhes,))
     conexao.commit()
     cursor.close()
     conexao.close()
+
 
 def elimar(banco_de_dados, iden, table):
     conexao = sq.connect(banco_de_dados)
@@ -124,10 +126,12 @@ def elimar(banco_de_dados, iden, table):
     curso.close()
     conexao.close()
 
-def update(banco_de_dados, table, coluna, mude, Referencia, constante):
+
+def update(banco_de_dados, table, coluna, mude, referencia, constante):
     conexao = sq.connect(banco_de_dados)
     curso = conexao.cursor()
-    curso.execute(f'''update {table} set {coluna} = {mude} where {Referencia}={constante}''')
+    lista = [table, coluna, mude, referencia, constante]
+    curso.execute(f'''update {lista[0]} set {lista[1]}={lista[2]} where {lista[3]}= {lista[4]}''',)
     conexao.commit()
     curso.close()
     conexao.close()

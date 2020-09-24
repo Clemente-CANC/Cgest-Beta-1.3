@@ -28,8 +28,12 @@ elif exitarq(nomed):
         definicoes[2] = definicoes_del[2]
 
 data = f'{datetime.today().day}/{datetime.today().month}/{datetime.today().year}'
+try:
+    tutores = abrir_Tutor(definicoes[2])
+except:
+    banco_de_dados(definicoes[2])
+    tutores = abrir_Tutor(definicoes[2])
 
-tutores = abrir_Tutor(definicoes[2])
 if len(tutores) == 0:
     criar_Tutor(definicoes[2], '<Desconhecio>', 123456, 1, '<nada>', '')
     tutores = abrir_Tutor(definicoes[2])
@@ -53,7 +57,6 @@ class Cgest:
     def message(text):
         sg.popup_quick_message(text, font='123 20')
         sleep(2)
-
 
     class Tela_p:
         global turmas
@@ -157,7 +160,7 @@ class Cgest:
                     self.window.find_element('-Alunos-').update(dados_dos_alunos)
                 elif button == 'Adicionar um novo aluno':
                     if values['-ListaDeTurmas-'] == 'Todas as turmas':
-                       Cgest.message('Por favor selecione uma turma')
+                        Cgest.message('Por favor selecione uma turma')
                     else:
                         cancela = 0
                         while cancela == 0:
@@ -176,7 +179,6 @@ class Cgest:
                     if not values['-Alunos-']:
                         Cgest.message('Selecione um ou varios alunos.')
 
-                    
     class Editar_turma:
         def __init__(self):
             self.maior = 0
@@ -190,9 +192,7 @@ class Cgest:
                 cont += 1
 
             self.layout_1 = [
-                [sg.Radio('Editar Turmar', 1, True, key='-EDT-'),
-                 sg.Radio('Adicionar uma nova turma', 1, key='-ADT-'), sg.Text('', size=(6, 1)),
-                 sg.Button('Adicionar uma turma', border_width=0)],
+                [sg.Button('Adicionar uma turma', border_width=0)],
                 [sg.Text('Editar nome da turma: '), sg.Combo([c[1] for c in turmas[1:]], size=(43, 1),
                                                              key='-NDT-', default_value=valores['NomeDaTurma'])],
                 [sg.Text('Tutor da turma: '), sg.OptionMenu([c[1] for c in tutores[:]], size=(46, 1),
@@ -243,23 +243,24 @@ class Cgest:
                     self.window['-Num-'].update(disabled=False)
                     self.window['-CLASS-'].update(True)
                 if botton == 'Actulizar' or botton == 'Eliminar Turma' and values['-EDT-']:
-                    if values['-EDT-']:
-                        for c in turmas:
-                            if c[1] == values['-NDT-']:
-                                print(c)
-                                self.window['-NDT-'].update(c[1])
-                                self.window['-TDT-'].update(c[2])
-                                self.window['-Num-'].update(c[3])
-                                self.window['-DETALHE-'].update(c[4])
-                                if not values['-CLASS-']:
-                                    self.window['-CLASS-'].update(False)
-                                else:
-                                    self.window['-CLASS-'].update(True)
+                    for c in abrir_Turmas(definicoes[2]):
+                        if c[1] == values['-NDT-']:
+                            print(c)
+                            self.window['-NDT-'].update(c[1])
+                            lista = [c[2]]
+                            for a in abrir_Tutor(definicoes[2]):
+                                if a[1] != c[2]:
+                                    lista.append(a[1])
+                            self.window['-TDT-'].update(values=lista)
+                            del lista
+                            self.window['-Num-'].update(c[3])
+                            self.window['-DETALHE-'].update(c[4])
+                            if not values['-CLASS-']:
+                                self.window['-CLASS-'].update(False)
+                            else:
+                                self.window['-CLASS-'].update(True)
                 # Opção para adicionar uma turma
                 if botton == 'Adicionar uma turma':
-                    if values['-EDT-']:
-                        Cgest.message('Por favor va para a opção ADICIONAR UMA TURMA')
-                    else:
                         cancela = 0
                         while cancela == 0:
                             for c in ID_Turmas(definicoes[2]):
@@ -269,12 +270,12 @@ class Cgest:
                                 if id != c[0]:
                                     # Verificando se existe uma turma com o mesmo nome para não gerar erro no programa.
                                     if values['-NDT-'] not in [f[1] for f in ID_Turmas(definicoes[2])]:
-                                    # verificando se o usuário definiu a classificação da turma.
+                                        # verificando se o usuário definiu a classificação da turma.
                                         if values['-CLASS-']:
                                             # Criando um turma apartir das informações introduzidas pelo usuário. 
                                             criar_Turma(definicoes[2], f'Nenhum nome definido {self.maior + 1}'
-                                                        if values['-NDT-'] == ''
-                                                        else values['-NDT-'], values['-TDT-'],
+                                            if values['-NDT-'] == ''
+                                            else values['-NDT-'], values['-TDT-'],
                                                         int(values['-Num-']), values['-DETALHE-'], ID=id)
                                             criar_aluno(definicoes[2],
                                                         f'Nenhum nome definido {self.maior + 1}'
@@ -319,17 +320,17 @@ class Cgest:
                         Cgest.message('Nome não definido' if values['-NDT-'] == '' else 'Operação invalida')
                     else:
                         for c in turmas:
-                                if c[1] == values['-NDT-']:
-                                    for k in turmas:
-                                        # Actulizar as classifições de todas as turmas.
-                                        if c[3] < k[3]:
-                                            update(definicoes[2], 'turmas', 'class', k[3]-1, 'ID', k[0])
-                                    for d in dados_dos_alunos:
-                                        if c[1] == d[5]:
-                                            elimar(definicoes[2], d[0], 'alunos')
-                                    elimar(definicoes[2], c[0], 'turmas')
-                                    turmas = abrir_Turmas(definicoes[2])
-                                    break
+                            if c[1] == values['-NDT-']:
+                                for k in turmas:
+                                    # Actulizar as classifições de todas as turmas.
+                                    if c[3] < k[3]:
+                                        update(definicoes[2], 'turmas', 'class', k[3] - 1, 'ID', k[0])
+                                for d in dados_dos_alunos:
+                                    if c[1] == d[5]:
+                                        elimar(definicoes[2], d[0], 'alunos')
+                                elimar(definicoes[2], c[0], 'turmas')
+                                turmas = abrir_Turmas(definicoes[2])
+                                break
                         self.window['-NDT-'].update(values=[c[1] for c in turmas[1:]])
                         self.window['-NDT-'].update('')
                         self.window['-TDT-'].update(tutores[0][1])
@@ -339,18 +340,16 @@ class Cgest:
                             self.window['-CLASS-'].update(False)
                         else:
                             self.window['-CLASS-'].update(True)
-                elif botton == 'Editar': 
-                        for c in turmas:
-                            if values['-NDT-'] == c[1]:
-                                update(definicoes[2], 'turmas', 'tutor', 'nsa', 'ID', c[0])
-                                update(definicoes[2], 'turmas', 'class', int(values['-CLASS-']) 
-                                if values['-CLASS-'] else c[3], 'ID', c[0])
-                                update(definicoes[2], 'turmas', 'detalhes', values['-DETALHE-'], 'ID', c[0])
-                                break
+                elif botton == 'Editar':
+                    for c in turmas:
+                        if values['-NDT-'] == c[1]:
+                            update(definicoes[2], 'turmas', 'tutor', '"{}"'.format(values['-TDT-']), 'ID', c[0])
+                            update(definicoes[2], 'turmas', 'class', int(values['-CLASS-'])
+                                   if values['-CLASS-']
+                                   else c[3], 'ID', c[0])
+                            update(definicoes[2], 'turmas', 'detalhes', '"{}"'.format(values['-DETALHE-']), 'ID', c[0])
+                            break
 
-                    
-
-                                                    
     class Alunos:
         def __init__(self):
             self.layout_1 = [

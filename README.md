@@ -5,5 +5,5 @@
  Esse sistema funciona com o banco da dados Sqlite3.
  Este é um programa de teste e não é a versão final,
  futuramente teremos um pdf sobre ele,
- para mais informações entre em contato com agente :
+ para mais informações entre em contato com agente em:
  www.facebook.com/CANC-design-103879817903979/?_rdr
