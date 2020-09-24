@@ -58,30 +58,10 @@ def abrir_alunos(BancoDeDados):
     return retorna
 
 
-def abrir_ID(BancoDeDados):
-    conexao = sq.connect(BancoDeDados)
-    cursor = conexao.cursor()
-    cursor.execute('select ID, turma from alunos')
-    retorna = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-    return retorna
-
-
 def abrir_Turmas(BancoDeDados):
     conexao = sq.connect(BancoDeDados)
     cursor = conexao.cursor()
     cursor.execute('select ID, nome, tutor, class, detalhes from turmas')
-    retorna = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-    return retorna
-
-
-def ID_Turmas(BancoDeDados):
-    conexao = sq.connect(BancoDeDados)
-    cursor = conexao.cursor()
-    cursor.execute('select ID, nome, class from turmas')
     retorna = cursor.fetchall()
     cursor.close()
     conexao.close()
