@@ -47,12 +47,16 @@ if len(turmas) == 0:
     criar_Turma(definicoes[2], 'Todas as turmas', tutores[0][1], 0, '')
     criar_Turma(definicoes[2], 'Turma1', tutores[0][1], 1, '', ID=1001)
     turmas = abrir_Turmas(definicoes[2])
+
 dados_dos_alunos = abrir_alunos(definicoes[2])
 if len(dados_dos_alunos) == 0:
     ID = randint(1000, 9999)
     criar_aluno(definicoes[2], turmas[1][1], data, ID)
     dados_dos_alunos = abrir_alunos(definicoes_del[2])
 valores = dict()
+del turmas
+del tutores
+
 
 
 class Cgest:
@@ -61,18 +65,7 @@ class Cgest:
         sg.popup_quick_message(text, font='123 20')
         sleep(2)
     
-    @staticmethod
     def convert_to_bytes(file_or_bytes, resize=None):
-        '''
-        Will convert into bytes and optionally resize an image that is a file or a base64 bytes object.
-        Turns into  PNG format in the process so that can be displayed by tkinter
-        :param file_or_bytes: either a string filename or a bytes base64 image object
-        :type file_or_bytes:  (Union[str, bytes])
-        :param resize:  optional new size
-        :type resize: (Tuple[int, int] or None)
-        :return: (bytes) a byte-string object
-        :rtype: (bytes)
-        '''
         if isinstance(file_or_bytes, str):
             img = PIL.Image.open(file_or_bytes)
         else:
@@ -90,11 +83,9 @@ class Cgest:
         with io.BytesIO() as bio:
             img.save(bio, format="PNG")
             del img
-            return bio.getvalue()
-    
-    logo = b'iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAMAAADbYcjNAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURQAAADBpmDFqmDBqmTFqmjJrmzJsmzJsnDNtnTRrmjVtmjZsmzRunTRunjVvnzdwnjVwnzpxnzVwoDZxoTdyojlyoThzozhzpDh0pDp1pjp2pj51ozt3qDt4qDx4qDx5qj16qj57rD58rT98rkF1oEB4pUB4pkR6pkJ6qEN8q0B9rUB9rkB+rkV7qUZ8qUp9p0x+p0h/rEB+sEeArkqArEqBr0uCrkKAsUKAskOCs0OCtESCtEWEtkaFuEaGuE2FsUiHukiIukmJvEmKvEqLvkuMvk2KuUyLvEyMv1OErVWDqlWHr1qHrVaIsVCMvFSPvV2LsViOuVSQvmyUtmyXuXKbvXefv3ugv06NwE6OwFmUwl2XxGScyGmbw22hynikxnmmyv/UO//UPP/VPf/UPv/VP//UQP/VQf/VQv/WQP/WQf/WQv/WQ//XRP/WRf/WSf/YRf/YRv/YR//YSP/ZSf/ZSv/aS//aTP/aTf/bTv/YUf/ZUv/bUP/cUP/cUv/dVP/dVv/eVv/bW//dWf/cWv/eWP/fWv/dXf/fXf/eXv/cYP/fYP/dZP/dZv/eZf/fZv/eaP/gW//gXP/gXv/gYP/iYf/iYv/hZP/jZP/iZv/kZv/jaf/ja//kaP/lav/kbP/lb//mbP/mbv/ncP/mcv/iff/ocv/odP/odv/oeP/of//qf4GnxYOox4SoxYSpx4asyo+ux4isyouuyouvzIyuyYyvy4yvzI6wy46wzIyz0pCuyJSxyZWyy5u3zZ24zpW30pG52J250J+60aC60KS90aDC3a3E163F2K3F2bPI2bvO3rzP3qvJ4LHN4rnR5P/qgf/qgv/qiP/sif/sjf/sj//olf/ql//ulv/omf/qnv/tnP/qoP/ro//qpP/sov/upf/tqP/uqP/vrf/vrv/us//wpP/wpv/xrf/wsP/wsv/ys//xtP/ytf/ytv/zuf/zuv/0vP/0vsDS38XZ6cnb6f/xw//zwv/yxf/1w//zyP/1yf/2zP/3z//30wAAAM55ho4AAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAABcQAAAXEAEYYRHbAAAAGHRFWHRTb2Z0d2FyZQBwYWludC5uZXQgNC4xLjFjKpxLAAADnElEQVRIS62OeVhUZRSHw6IosQzGBgoIszKXqGylghKwbHErNVPbEFQQTXYogzZtt2SmiSEHnBHJPdM2Ldv3xbW91Pay0tT29dc53znfvTP809Pz9P7x3Xvu8773fHvhP/M/JBce0GX/8/WduX3ipDt/1nclNrk4TnhR5y1FVzHX/KqzISY5Uou4uLVm/sgEzF1mFqKTruozL9D8gfrM1aIwbvJaF7WFJ4FJqgtb1XOTN1R1eBqYrLbwvpo2+SF2B/NEbFNY+IWoNum6t0UD4imgTO3CCROKiqaJqsnx8fHx+7ho/RBALsnFxcUlJSWlNxpXkkv2I/a1uPnLWEA626WlU6aUlf3uJomJiccdlJDAoQvFBwPsklw2deq06dNnO8nIbj3oHE4hkWDQ7HVcSzLb5eXlFRWVTtKj+/P8OJDojfO6Wahfi3uMW1FZWVVVVV39jk2Skl6RR9JhwOjunDJUPYfZ1q6uqampvcUmWZ4sOpcnJ9Pj8WQqHYAZ4tbW1tXV19ffbJNXPZ6sUUM8nqOBRzweT7LDBQDZdcYmZlz3rk2wNCUlxes9iXYcwlBmOAq4W12moeE2liXBg9QcA6yiB+P1eqk8FtgmdoOh8SbjaoJlqacAj6ZqYqBffCJyo+GGO0S1CVYDKw8VUg0nAJ87NnOrmk4CPJYmSNeHdjQ2Xm/kmcx9qkUlKzKU9PT0tLSTaYeVZ84i/KpFJQ9nZmYermRknAh8qu6sOU1EUDXCJit6UuJwFu1gm+WmJp/PR7f6xr9NVE2eOYLoaeEdVvb5/H7/XOC7QCDwoXE16d+L4IzpC3xmZLb99wYC9wPbm5mP2ZVkRH9DP0OvK/CLcUkmmpvn0Y5gsKWlJRRykwEOXAJBI5NNBNtoRyhEJxa3bnKS005ltBoAqGz+3E47Qq2tO9gLR+jQJAbaItdgWhdje1tbOPwHe5GFdEhyuiE7O1sTkQ1t4fZwOBKJbCTt6/lfOsllZ0TzE9rZpV8bORKZz2z46q2ODpYlwZmCJFfiTyuL3WHZzK4ma7QRgJ2dZcG4mmBoriEnJ4eSc4BvO9vMe0a1CQZKIwwDdqkWxRIxnWT9QOJsITd3KN1NRRc1nQTrzs3L40y4CNitprLwbxXdBD/mM3nCWPoQs+cBkYioBLi8oMBk+flcAHtUJ942HwwxCd4cM2hQATFO5+81WPSbfmBiE+Cl8ZcOHvusDsBfG+hKm/foJHRO/hXgH831bVAP1oP5AAAAAElFTkSuQmCC'
+            return bio.getvalue()   
     menu_def = ['My Menu Def', ['Volta ao Cgest','---', 'Sair do Cgest']]
-    ami = sg.SystemTray(menu=menu_def, data_base64=logo, tooltip=' Cgest beta 1.3 ')
+    ami = sg.SystemTray(menu=menu_def, data=convert_to_bytes('image1.png', resize=(300, 300)), tooltip=' Cgest beta 1.3 ')
     ami.Hide()
 
     class Tela_p:
@@ -126,7 +117,7 @@ class Cgest:
                  sg.Button('Remover aluno', border_width=0),
                  sg.Button('Adicionar um novo aluno', border_width=0),
                  sg.Button('Minimizar', border_width=0),
-                 sg.Text('', size=(83, 1)),
+                 sg.Text('', size=(73, 1)),
                  sg.Button('Sair do Cgest', border_width=0,
                            button_color=('white', 'red'), pad=(8, 1),
                            size=(15, 2))]
@@ -136,10 +127,10 @@ class Cgest:
                                     font='Calibri',
                                     right_click_menu=['Actualizar dados', ['Editar turma', 'Adicionar um novo aluno',
                                                                            'Sair do Cgest']],
-                                    finalize=True)
+                                    finalize=True, icon='image1.ico')
 
         def star(self):
-            global turmas, dados_dos_alunos
+            global dados_dos_alunos
             while True:
                 self.window.read(timeout=1)
                 sg.theme(definicoes[0])
@@ -150,16 +141,23 @@ class Cgest:
 
                 if values['-ListaDeTurmas-'] == 'Todas as turmas' and self.window['-Tutor-'] != 'Nenhum':
                     self.window.find_element('-Tutor-').update('Nenhum')
+                    dados_dos_alunos = abrir_alunos(definicoes[2])
+                    self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
                 else:
                     for c in abrir_Turmas(definicoes[2]):
                         if c[1] == values['-ListaDeTurmas-']:
                             self.window.find_element('-Tutor-').update(c[2])
+                            dados_dos_alunos = []
+                            for a in abrir_alunos(definicoes[2]):
+                                if a[5] == c[1]:
+                                    dados_dos_alunos.append(a)
+                            self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
+
                 if True:
-                    dados_dos_alunos = abrir_alunos(definicoes[2])
-                    self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
                     valores['NomeDaTurma'] = values['-ListaDeTurmas-']
 
                 if button == '-Actualizar-':
+
                     pass
                 
                 elif button == '-EditarTurma-':
@@ -204,15 +202,42 @@ class Cgest:
                                 if c[5] == values['-ListaDeTurmas-']:
                                     if id != c[0]:
                                         criar_aluno(definicoes[2], values['-ListaDeTurmas-'], data, id)
-                                        dados_dos_alunos = abrir_alunos(definicoes[2])
+                                        for c in abrir_Turmas(definicoes[2]):
+                                            if c[1] == values['-ListaDeTurmas-']:
+                                                self.window.find_element('-Tutor-').update(c[2])
+                                                dados_dos_alunos = []
+                                                for a in abrir_alunos(definicoes[2]):
+                                                    if a[5] == c[1]:
+                                                        dados_dos_alunos.append(a)
                                         self.window['-Alunos-'].Update(values=dados_dos_alunos)
                                         cancela = 1
                                         break
                 elif button == 'Remover aluno':
-                    r = values['-Alunos-'][:][:]
-                    print(r)
-                    if not values['-Alunos-']:
+                    if not values['-Alunos-']: 
                         Cgest.message('Selecione um ou varios alunos.')
+                    else:
+                        indice = [i for i in values['-Alunos-']]
+                        print(indice)
+                        numero_de_alunos=[]
+                        for c in abrir_alunos(definicoes[2]):
+                                    if values['-ListaDeTurmas-'] == c[5]:
+                                        numero_de_alunos.append(c)
+                        for c in indice:
+                            if len(numero_de_alunos) > 1:
+                                elimar(definicoes[2], dados_dos_alunos[c][0], 'alunos')
+                                numero_de_alunos=[]
+                                for c in abrir_alunos(definicoes[2]):
+                                    if values['-ListaDeTurmas-'] == c[5]:
+                                        numero_de_alunos.append(c)
+                            else:
+                                Cgest.message('Não é possivel deletar o ultimo aluno.')
+                                break
+                        dados_dos_alunos = []
+                        for a in abrir_alunos(definicoes[2]):
+                            if a[5] == values['-ListaDeTurmas-']:
+                                dados_dos_alunos.append(a)
+                        self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
+                        
                 elif button == 'Minimizar':
                     visi_janela = False
                     self.window.Hide()
@@ -257,8 +282,8 @@ class Cgest:
                 [sg.Button('Adicionar uma turma', border_width=0)],
                 [sg.Text('Editar nome da turma: '), sg.Combo([c[1] for c in abrir_Turmas(definicoes[2])[1:]], size=(43, 1),
                                                              key='-NDT-', default_value=valores['NomeDaTurma'])],
-                [sg.Text('Tutor da turma: '), sg.OptionMenu([c[1] for c in tutores[:]], size=(46, 1),
-                                                            key='-TDT-', default_value=tutores[0][1])],
+                [sg.Text('Tutor da turma: '), sg.OptionMenu([c[1] for c in abrir_Tutor(definicoes[2])], size=(46, 1),
+                                                            key='-TDT-')],
                 [sg.Checkbox('Definir classificação da turma', key='-CLASS-'),
                  sg.Spin([c for c in range(1, self.maior + 1)], size=(6, 1), key='-Num-', disabled=True)],
                 [sg.Text('Detalhes da turma.')],
@@ -287,7 +312,7 @@ class Cgest:
                              [sg.Tab('Editar dados do Tutor', self.layout_2)],
                              ]
             self.layout = [[sg.TabGroup(self.layout_5)]]
-            self.window = sg.Window('Turma/Tutor', self.layout, size=(509, 300), margins=(0, 0))
+            self.window = sg.Window('Turma/Tutor', self.layout, size=(509, 300), margins=(0, 0), icon='image1.ico')
 
         def star(self):
             while True:
@@ -510,7 +535,7 @@ class Cgest:
     class Alunos:
         def __init__(self):
             self.layout_1 = [
-                [sg.Image(data=Cgest().convert_to_bytes(r'E:\imagen\IMG_20180527_132212.jpg', resize=(500, 300)), size=(300, 300),
+                [sg.Image(size=(300, 300),
                           background_color='black'),
                  sg.Column([[sg.Frame('', [
                      [sg.Text('Clement A. N. Cazadi', font='Calibri 30')],
@@ -533,7 +558,7 @@ class Cgest:
             ]
 
             self.window = sg.Window('Detalhes do aluno', self.layout_1, margins=(0, 0),
-                                    size=(850, 620), element_justification='center', font='Calibri 12').Finalize()
+                                    size=(850, 620), element_justification='center', font='Calibri 12', icon='image1.ico') # data=Cgest().convert_to_bytes(r'E:\imagen\IMG_20180527_132212.jpg', resize=(500, 300))
 
         def star(self):
             while True:
@@ -542,20 +567,19 @@ class Cgest:
                     self.window.close()
                     break
                 
-
     class Deficoes:
         def __init__(self):
             self.layout = [
-                [sg.Text('Defina a lingua:'), sg.Combo(['Português', 'Ingleis', 'Franceis'],
+                [sg.Text('Defina a lingua:'), sg.OptionMenu(['Português', 'Inglês', 'Francês'],
                                                        size=(23, 1), default_value=definicoes[1])],
-                [sg.Text('Defina um Tema:'), sg.Combo(['TanBlue', 'LightGreen3', 'LightBlue3',
+                [sg.Text('Defina um Tema:'), sg.OptionMenu(['TanBlue', 'LightGreen3', 'LightBlue3',
                                                        'GreenTan', 'GreenMono', 'DarkTeal9', 'LightBrown11',
                                                        'LightGrey6',
                                                        'LightGreen2', 'DarkBlue3', 'LightGrey3'],
                                                       size=(22, 1), default_value=definicoes[0], key='-CorDeFundo-')],
                 [sg.Button('Salvar', border_width=0, size=(10, 2)), sg.Button('Cancelar', border_width=0, size=(10, 2))]
             ]
-            self.Window = sg.Window('Definições', self.layout, element_justification='center')
+            self.Window = sg.Window('Definições', self.layout, element_justification='center', icon='image1.ico')
 
         def star(self):
             while True:
@@ -590,7 +614,7 @@ class Cgest:
                                     '\nAlison pares.'
                                     '\nRamiro Ngando.\nEntre em contacto com agente em:\n'
                                     'Www.facebook.com/CANC-design')], [sg.Button('Ok', border_width=0, size=(6, 2))]]
-            self.window = sg.Window('About', self.layout, element_justification='center', disable_minimize=True)
+            self.window = sg.Window('About', self.layout, element_justification='center', disable_minimize=True, icon='image1.ico')
 
         def star(self):
             while True:
@@ -608,7 +632,7 @@ class Cgest:
                                            key='-Procurar-')],
                            [sg.Button('Conluir', border_width=0, size=(13, 2))]
                            ]
-            self.window = sg.Window('Abrir CGT', self.layout, element_justification='center', disable_minimize=True)
+            self.window = sg.Window('Abrir CGT', self.layout, element_justification='center', disable_minimize=True, icon='image1.ico')
 
         def star(self):
             while True:

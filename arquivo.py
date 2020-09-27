@@ -17,7 +17,7 @@ def banco_de_dados(banco_dados: str, tente=False):
         cursor.execute(
             'create table if not exists alunos(ID int, nome text, idade int, sexo text, '
             'data1 text, turma text, data2 text, numero1 int, numero2 int, morada text,'
-            ' email text, detalhes text)')
+            ' email text, detalhes text, foto text)')
         cursor.execute(
             'create table if not exists tutor(ID int, nome text, numero text, sexo int, aulas text, detalhes text)')
         cursor.execute(
@@ -40,8 +40,8 @@ def criar_aluno(banco_dados, turma, date2, Id=1000):
     conexao = sq.connect(banco_dados)
     cursor = conexao.cursor()
     cursor.execute('''insert into alunos(ID, nome, idade, sexo, data1, turma, data2, numero1, numero2,
-     morada, email, detalhes) values(?, 'Desconhecido', 10, ?, 
-     '00/00/0000', ?, ?, 111111, 222222, 'mundo', '<nada>', ' ')''', (Id, sexo, turma, date2))
+     morada, email, detalhes, foto) values(?, 'Desconhecido', 10, ?, 
+     '00/00/0000', ?, ?, 111111, 222222, 'mundo', '<nada>', ' ', 'image1.png')''', (Id, sexo, turma, date2))
     conexao.commit()
     cursor.close()
     conexao.close()
