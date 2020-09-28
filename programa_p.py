@@ -111,7 +111,7 @@ class Cgest:
                 [sg.Table(values=dados_dos_alunos[:], headings=self.table, justification='left', size=(60, 25),
                           vertical_scroll_only=False,
                           right_click_menu=['Detalhes',
-                                            ['Ver detalhes do aluno', 'Passar aluno para Turma seginte',
+                                            ['Adicionar um novo aluno', 'Ver detalhes do aluno', 'Passar aluno para Turma seginte',
                                              'Remover aluno', 'Actualizar dados']], key='-Alunos-')],
                 [sg.Button('Atualizar dados', border_width=0, key='-Actualizar-'),
                  sg.Button('Remover aluno', border_width=0),
@@ -124,10 +124,7 @@ class Cgest:
             ]
 
             self.window = sg.Window('Cgest Beta 1.3', self.layout, size=(1240, 700),
-                                    font='Calibri',
-                                    right_click_menu=['Actualizar dados', ['Editar turma', 'Adicionar um novo aluno',
-                                                                           'Sair do Cgest']],
-                                    finalize=True, icon='image1.ico')
+                                    font='Calibri',finalize=True, icon='image1.ico')
 
         def star(self):
             global dados_dos_alunos
@@ -216,28 +213,45 @@ class Cgest:
                     if not values['-Alunos-']: 
                         Cgest.message('Selecione um ou varios alunos.')
                     else:
-                        indice = [i for i in values['-Alunos-']]
-                        print(indice)
-                        numero_de_alunos=[]
-                        for c in abrir_alunos(definicoes[2]):
-                                    if values['-ListaDeTurmas-'] == c[5]:
-                                        numero_de_alunos.append(c)
-                        for c in indice:
-                            if len(numero_de_alunos) > 1:
-                                elimar(definicoes[2], dados_dos_alunos[c][0], 'alunos')
+                        if values['-ListaDeTurmas-'] == 'Todas as turmas':
+                            indice = [i for i in values['-Alunos-']]
+                            alunos = dict()
+                            for c in indice:
+                                alunos[dados_dos_alunos[c][0]] = dados_dos_alunos[c][5]
+                            print(alunos)
+                            for ident, turma in alunos.items():
                                 numero_de_alunos=[]
-                                for c in abrir_alunos(definicoes[2]):
-                                    if values['-ListaDeTurmas-'] == c[5]:
-                                        numero_de_alunos.append(c)
-                            else:
-                                Cgest.message('Não é possivel deletar o ultimo aluno.')
-                                break
-                        dados_dos_alunos = []
-                        for a in abrir_alunos(definicoes[2]):
-                            if a[5] == values['-ListaDeTurmas-']:
-                                dados_dos_alunos.append(a)
-                        self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
-                        
+                                for a in abrir_alunos(definicoes[2]):
+                                    if a[5] == turma:
+                                        numero_de_alunos.append(a[1])
+                                if len(numero_de_alunos) > 1:
+                                    elimar(definicoes[2], ident, 'alunos')
+                                else:
+                                    Cgest.message('Não é possivel deletar o ultimo aluno.')
+                            dados_dos_alunos = abrir_alunos(definicoes[2])
+                            self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
+                        else:
+                            indice = [i for i in values['-Alunos-']]
+                            print(indice)
+                            numero_de_alunos=[]
+                            for c in abrir_alunos(definicoes[2]):
+                                        if values['-ListaDeTurmas-'] == c[5]:
+                                            numero_de_alunos.append(c)
+                            for c in indice:
+                                if len(numero_de_alunos) > 1:
+                                    elimar(definicoes[2], dados_dos_alunos[c][0], 'alunos')
+                                    numero_de_alunos=[]
+                                    for c in abrir_alunos(definicoes[2]):
+                                        if values['-ListaDeTurmas-'] == c[5]:
+                                            numero_de_alunos.append(c)
+                                else:
+                                    Cgest.message('Não é possivel deletar o ultimo aluno.')
+                                    break
+                            dados_dos_alunos = []
+                            for a in abrir_alunos(definicoes[2]):
+                                if a[5] == values['-ListaDeTurmas-']:
+                                    dados_dos_alunos.append(a)
+                            self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
                 elif button == 'Minimizar':
                     visi_janela = False
                     self.window.Hide()
