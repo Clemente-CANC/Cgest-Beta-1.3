@@ -51,7 +51,7 @@ def abrir_alunos(BancoDeDados):
     conexao = sq.connect(BancoDeDados)
     cursor = conexao.cursor()
     cursor.execute('select ID, nome, idade, sexo, data1, turma, data2, numero1, numero2, '
-                   'morada, email, detalhes from alunos')
+                   'morada, email, detalhes, foto from alunos')
     retorna = cursor.fetchall()
     cursor.close()
     conexao.close()
