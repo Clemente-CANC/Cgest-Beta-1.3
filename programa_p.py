@@ -64,28 +64,53 @@ class Cgest:
         sleep(2)
     
     def convert_to_bytes(file_or_bytes, resize=None):
-        if isinstance(file_or_bytes, str):
-            img = PIL.Image.open(file_or_bytes)
-        else:
-            try:
-                img = PIL.Image.open(io.BytesIO(base64.b64decode(file_or_bytes)))
-            except Exception as e:
-                dataBytesIO = io.BytesIO(file_or_bytes)
-                img = PIL.Image.open(dataBytesIO)
+        global ident
+        try:
+            if isinstance(file_or_bytes, str):
+                img = PIL.Image.open(file_or_bytes)
+            else:
+                try:
+                    img = PIL.Image.open(io.BytesIO(base64.b64decode(file_or_bytes)))
+                except Exception as e:
+                    dataBytesIO = io.BytesIO(file_or_bytes)
+                    img = PIL.Image.open(dataBytesIO)
 
-        cur_width, cur_height = img.size
-        if resize:
-            new_width, new_height = resize
-            scale = min(new_height/cur_height, new_width/cur_width)
-            img = img.resize((int(cur_width*scale), int(cur_height*scale)), PIL.Image.ANTIALIAS)
-        with io.BytesIO() as bio:
-            img.save(bio, format="PNG")
-            del img
-            return bio.getvalue()   
+            cur_width, cur_height = img.size
+            if resize:
+                new_width, new_height = resize
+                scale = min(new_height/cur_height, new_width/cur_width)
+                img = img.resize((int(cur_width*scale), int(cur_height*scale)), PIL.Image.ANTIALIAS)
+            with io.BytesIO() as bio:
+                img.save(bio, format="PNG")
+                del img
+                return bio.getvalue() 
+        except:
+            update(definicoes[2], 'alunos', 'foto', '"image1.png"', 'ID', Cgest().ident)
+            file_or_bytes = 'image1.png'
+            if isinstance(file_or_bytes, str):
+                img = PIL.Image.open(file_or_bytes)
+            else:
+                try:
+                    img = PIL.Image.open(io.BytesIO(base64.b64decode(file_or_bytes)))
+                except Exception as e:
+                    dataBytesIO = io.BytesIO(file_or_bytes)
+                    img = PIL.Image.open(dataBytesIO)
+
+            cur_width, cur_height = img.size
+            if resize:
+                new_width, new_height = resize
+                scale = min(new_height/cur_height, new_width/cur_width)
+                img = img.resize((int(cur_width*scale), int(cur_height*scale)), PIL.Image.ANTIALIAS)
+            with io.BytesIO() as bio:
+                img.save(bio, format="PNG")
+                del img
+                return bio.getvalue()   
     menu_def = ['My Menu Def', ['Volta ao Cgest','---', 'Sair do Cgest']]
     ami = sg.SystemTray(menu=menu_def, data=convert_to_bytes('image1.png', resize=(300, 300)), tooltip=' Cgest beta 1.3 ')
     ami.Hide()
     ident = None
+    turma = None
+    alunos = None
 
     class Tela_p:
         def __init__(self):
@@ -103,14 +128,12 @@ class Cgest:
                  sg.Button('Editar turma', border_width=0, size=(15, 1), key='-EditarTurma-')],
                 [sg.Text('Tutor da turma:'), sg.Text('Nenhum', key='-Tutor-', size=(100, 1))],
                 [sg.Text('')],
-                [sg.Text('Alunos Cadastrados'), sg.Text('', size=(7, 1)),
-                 sg.Text('Ordena por:'), sg.Combo(['Nome', 'Idade', 'Id', 'Data de inscrição'], default_value='Nome'),
-                 sg.Text('Pesquisar:'),
-                 sg.InputText('Pesquisar por nome do aluno', border_width=0)],
+                [sg.Text('Alunos Cadastrados:'), sg.Text(len(abrir_alunos(definicoes[2])), key='-Alnum-'), sg.Text('', size=(63, 1)),sg.Text('Pesquisar:'),
+                 sg.InputText('Pesquisar por nome do aluno', border_width=0, key='-Pesq-'), sg.Button('Pesquisar', border_width=0)],
                 [sg.Table(values=dados_dos_alunos[:], headings=self.table, justification='left', size=(60, 25),
                           vertical_scroll_only=False,
                           right_click_menu=['Detalhes',
-                                            ['Adicionar um novo aluno', 'Ver detalhes do aluno', 'Passar aluno para Turma seginte',
+                                            ['Adicionar um novo aluno', 'Ver detalhes do aluno',
                                              'Remover aluno', 'Actualizar dados']], key='-Alunos-')],
                 [sg.Button('Atualizar dados', border_width=0, key='-Actualizar-'),
                  sg.Button('Remover aluno', border_width=0),
@@ -139,6 +162,7 @@ class Cgest:
                     self.window.find_element('-Tutor-').update('Nenhum')
                     dados_dos_alunos = abrir_alunos(definicoes[2])
                     self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
+                    self.window['-Alnum-'].update(len(dados_dos_alunos))
                 else:
                     for c in abrir_Turmas(definicoes[2]):
                         if c[1] == values['-ListaDeTurmas-']:
@@ -148,6 +172,7 @@ class Cgest:
                                 if a[5] == c[1]:
                                     dados_dos_alunos.append(a)
                             self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
+                            self.window['-Alnum-'].update(len(dados_dos_alunos))
 
                 if True:
                     valores['NomeDaTurma'] = values['-ListaDeTurmas-']
@@ -157,27 +182,37 @@ class Cgest:
                 
                 elif button == '-EditarTurma-':
                     if values['-ListaDeTurmas-'] == 'Todas as turmas':
-                        Cgest.message('Por favor selecione uma turma')
+                        Cgest.message('Por favor selecione uma turma.')
                     else:
+                        Cgest.turma = values['-ListaDeTurmas-']
                         self.window.Hide()
                         Cgest.Editar_turma().star()
                         self.window.UnHide()
-                        dados_dos_alunos = abrir_alunos(definicoes[2])
+                        dados_dos_alunos = []
+                        for c in abrir_alunos(definicoes[2]):
+                            if c[5] == Cgest.turma:
+                                dados_dos_alunos.append(c)
                         self.window['-ListaDeTurmas-'].update(values=[c[1] for c in abrir_Turmas(definicoes[2])])
                         self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
 
                 elif button == 'Ver detalhes do aluno':
                     if not values['-Alunos-']:
-                        Cgest().message('Selecione um aluno(a)')
+                        Cgest().message('Selecione um(a) aluno(a).')
                     else:
                         Cgest.ident = None
+                        Cgest.turma = values['-ListaDeTurmas-']
                         indice = [i for i in values['-Alunos-']]
                         Cgest.ident = dados_dos_alunos[indice[0]][0]
-                        print(Cgest.ident)
                         self.window.Hide()
                         Cgest.Alunos().star()
                         self.window.UnHide()
-                        dados_dos_alunos = abrir_alunos(definicoes[2])
+                        dados_dos_alunos = []
+                        for c in abrir_alunos(definicoes[2]):
+                            if Cgest.turma != 'Todas as turmas':
+                                if c[5] == Cgest.turma:
+                                    dados_dos_alunos.append(c)
+                            else:
+                                dados_dos_alunos.append(c)
                         self.window['-Alunos-'].Update(values=dados_dos_alunos)
                         self.window['-ListaDeTurmas-'].Update(values=[c[1] for c in abrir_Turmas(definicoes[2])])
                 elif button == 'Definições':
@@ -196,7 +231,7 @@ class Cgest:
                     self.window.find_element('-Alunos-').update(dados_dos_alunos)
                 elif button == 'Adicionar um novo aluno':
                     if values['-ListaDeTurmas-'] == 'Todas as turmas':
-                        Cgest.message('Por favor selecione uma turma')
+                        Cgest.message('Por favor selecione uma turma.')
                     else:
                         cancela = 0
                         while cancela == 0:
@@ -213,6 +248,7 @@ class Cgest:
                                                     if a[5] == c[1]:
                                                         dados_dos_alunos.append(a)
                                         self.window['-Alunos-'].Update(values=dados_dos_alunos)
+                                        self.window['-Alnum-'].update(len(dados_dos_alunos))
                                         cancela = 1
                                         break
                 elif button == 'Remover aluno':
@@ -233,9 +269,10 @@ class Cgest:
                                 if len(numero_de_alunos) > 1:
                                     elimar(definicoes[2], ident, 'alunos')
                                 else:
-                                    Cgest.message('Não é possivel deletar o ultimo aluno.')
+                                    Cgest.message('Não é possivel deletar o(a) ultimo(a) aluno(a).')
                             dados_dos_alunos = abrir_alunos(definicoes[2])
                             self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
+                            self.window['-Alnum-'].update(len(dados_dos_alunos))
                         else:
                             indice = [i for i in values['-Alunos-']]
                             print(indice)
@@ -251,13 +288,31 @@ class Cgest:
                                         if values['-ListaDeTurmas-'] == c[5]:
                                             numero_de_alunos.append(c)
                                 else:
-                                    Cgest.message('Não é possivel deletar o ultimo aluno.')
+                                    Cgest.message('Não é possivel deletar o(a) ultimo(a) aluno(a).')
                                     break
                             dados_dos_alunos = []
                             for a in abrir_alunos(definicoes[2]):
                                 if a[5] == values['-ListaDeTurmas-']:
                                     dados_dos_alunos.append(a)
                             self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
+                            self.window['-Alnum-'].update(len(dados_dos_alunos))
+                elif button == 'Pesquisar':
+                    dados_dos_alunos = []
+                    conte = 0
+                    for c in abrir_alunos(definicoes[2]):
+                        if values['-Pesq-'].lower() in c[1].lower():
+                            if values['-ListaDeTurmas-'] == 'Todas as turmas':
+                                dados_dos_alunos.append(c)
+                                conte += 1
+                            else:
+                                if c[5] == values['-ListaDeTurmas-']:
+                                    dados_dos_alunos.append(c)
+                                    conte += 1
+                    if conte == 0:
+                        Cgest.message('Nenhum(a) aluno(a) encontrado(a).')
+                    self.window.find_element('-Alunos-').update(values=dados_dos_alunos)
+                    self.window['-Alnum-'].update(len(dados_dos_alunos))
+
                 elif button == 'Minimizar':
                     visi_janela = False
                     self.window.Hide()
@@ -332,7 +387,6 @@ class Cgest:
         def star(self):
             while True:
                 botton, values = self.window.read()
-                print(botton, values)
                 if botton in ('Cancelar', '-Sair-', None, sg.WIN_CLOSED):
                     self.window.close()
                     break
@@ -523,7 +577,7 @@ class Cgest:
                                 break
                             else:
                                 Cgest.message('Erro: não introduziu nenhum nome' if values['-NDT-'] == '' 
-                                              else 'Este tutor já existe')
+                                              else 'Este(a) tutor(a) já existe')
                                 self.window['-NT-'].update('')
                                 cancela = 1
                                 break
@@ -551,61 +605,88 @@ class Cgest:
         def __init__(self):
             self.aluno = None
             self.lista = None
+            self.image = None
             for c in abrir_alunos(definicoes[2]):
                 if c[0] == Cgest.ident:
                     self.aluno = c
-                    self.lista = [c[5]]
-                    for a in abrir_Turmas(definicoes[2])[1:]:
-                        if a[1] != c[5]:
-                            self.lista.append(a[1])
-                    break 
+                    self.image = c[12]
+                    break
+                #sg.Image(size=(300, 300), data=Cgest.convert_to_bytes(self.aluno[12], (500,300)),
             self.layout_1 = [
-                [sg.Image(size=(300, 300), data=Cgest.convert_to_bytes(c[12], (500,300)),
-                          background_color='black'),
+                [sg.Column([[sg.Frame('Foto de perfil',[[sg.Image(size=(300, 300), data=Cgest.convert_to_bytes(self.aluno[12], (500,300)),
+                                                    background_color='black',key='-FotoDePerfil-', tooltip=r' {} '.format(self.aluno[12]))],
+                                                        [sg.Button('Pré-visualizar a imagem', size=(37, 1))]])]]),
                  sg.Column([[sg.Frame('', [
-                     [sg.Text(f'{self.aluno[1]}' if len(self.aluno[1]) <= 23 else f'{self.aluno[1][:24]}...', font='Calibri 30', tooltip=self.aluno[1], key='-TITULO-')],
-                     [sg.FilesBrowse('Carregar uma foto', file_types=(('Png', '.png'), ('Jpng', '.jpng')), key='-PesFoto-'),
+                     [sg.Text(f'{self.aluno[1]}' if len(self.aluno[1]) < 19 else f'{self.aluno[1][:19]}...', font='Calibri 30', tooltip=f' {self.aluno[1]} ', key='-TITULO-')],
+                     [sg.FilesBrowse('Carregar uma foto', file_types=(('Png', '.png'), ('Jpng', '.jpg')), key='-PesFoto-'),
                       sg.Button('Repor a imagem padrão'), sg.Button('Atualizar'), sg.Button('Editar dados')],
                      [sg.Text('ID do(a) aluno(a):'), sg.Text(f'{Cgest.ident}', key='-ID-')],
-                     [sg.Text('Nome do(a) aluno(a):'), sg.InputText(aluno[1],
+                     [sg.Text('Nome do(a) aluno(a):'), sg.InputText(self.aluno[1],
                                                               border_width=0, size=(50, 1), key='-Nome-')],
+                     [sg.Text('Idade atual:'), sg.InputText(self.aluno[2], border_width=0, size=(50, 1), key='-Idade-')],
                      [sg.Text('Data de nascimento:'), sg.InputText(self.aluno[4], border_width=0, size=(47, 1), key='-Nasci-')],
                      [sg.Text('Número de telefone 1:'), sg.InputText(self.aluno[7], border_width=0, key='-Num1-')],
                      [sg.Text('Número de telefone 2:'), sg.InputText(self.aluno[8], border_width=0, key='-Num2-')],
-                     [sg.Text('Data de inscrição: '), sg.InputText(self.aluno[6], border_width=0, size=(48, 1), key='-Inscr-')],
-                     [sg.Text('Defina a Turma:'), sg.OptionMenu(self.lista, size=(46, 1), key='Turma')],
+                     [sg.Text('Turma:'), sg.Text('', size=(11, 1)), sg.Text(self.aluno[5], key='-Turma-')],
                      [sg.Text('E-mail:'), sg.InputText(self.aluno[10], size=(57, 1), border_width=0, key='-Email-')],
-                     [sg.Text('Morada:'), sg.InputText(self.aluno[9], size=(57, 1), border_width=0), key='-Morada-'],
+                     [sg.Text('Morada:'), sg.InputText(self.aluno[9], size=(57, 1), border_width=0, key='-Morada-')],
                      [sg.Text('Sexo do(a) aluno(a):'), sg.Radio('Masculino', 1, True if self.aluno[3] == 'Masculino' else False, key='-SEX1-'), sg.Radio('Feminino', 1, True if self.aluno[3] == 'Feminino' else False, key='-SEX2-')]
                  ], border_width=0)]])],
                 [sg.Text('Detalhes adicionas do(a) aluno(a)')],
                 [sg.MLine(self.aluno[11], size=(100, 8), key='-Detalhe-')]
             ]
-
             self.window = sg.Window('Detalhes do aluno', self.layout_1, margins=(0, 0),
-                                    size=(850, 620), element_justification='center', font='Calibri 12', icon='image1.ico') # data=Cgest().convert_to_bytes(r'E:\imagen\IMG_20180527_132212.jpg', resize=(500, 300))
+                                    size=(850, 620), element_justification='center', 
+                                    font='Calibri 12', icon='image1.ico')
 
         def star(self):
-
+            global dados_dos_alunos
             while True:
-                botton, values = self.window.read()
-                if botton in (None, sg.WIN_CLOSED):
+                button, values = self.window.read()
+                if button in (None, sg.WIN_CLOSED):
                     self.window.close()
                     break
-                if botton == 'Atualizaar':
-                    self.aluno = dados_dos_alunos[Cgest.ident]
-                    #self.window[].Update()
-                    #self.window[].Update()
-                    #self.window[].Update()
-                    #self.window[].Update()
-                    #self.window[].Update()
-                    #self.window[].Update()
-                    #self.window[].Update()
-                    #self.window[].Update()
-                    #self.window[].Update()
-                    #self.window[].Update()
-
-         
+                if button == 'Pré-visualizar a imagem':
+                    if values['-PesFoto-']:
+                        self.image = values['-PesFoto-']
+                        self.window['-FotoDePerfil-'].Update(data=Cgest.convert_to_bytes(r'{}'.format(self.image), (500, 300)), size=(300, 300))
+                if button == 'Atualizar':
+                    for c in dados_dos_alunos:
+                        if c[0] == Cgest.ident:
+                            self.window['-TITULO-'].Update(f'{c[1]}' if len(c[1]) < 19 else f'{c[1][:19]}...')
+                            self.window['-FotoDePerfil-'].Update(data=Cgest.convert_to_bytes(r'{}'.format(c[12]), (500, 300)), size=(300, 300))
+                            self.window['-Nome-'].Update(c[1])
+                            self.window['-Idade-'].Update(c[2])
+                            self.window['-Nasci-'].Update(c[4])
+                            self.window['-Num1-'].Update(c[7])
+                            self.window['-Num2-'].Update(c[8])
+                            self.window['-Email-'].Update(c[10])
+                            self.window['-Morada-'].Update(c[9])
+                            if c[3] == 'Masculino':
+                                self.window['-SEX1-'].Update(True)
+                            else:
+                                self.window['-SEX2-'].Update(True)
+                            self.window['-Detalhe-'].Update(c[11])
+                            self.image = c[12]
+                if button == 'Editar dados':
+                    update(definicoes[2], 'alunos', 'nome', '"{}"'.format(values['-Nome-'].strip().title()) if values['-Nome-'] else '"<Desconhecido>"', 'ID', Cgest().ident)
+                    update(definicoes[2], 'alunos', 'data1', '"{}"'.format(values['-Nasci-'].strip()) if values['-Nasci-'] else '"11/03/2011"', 'ID', Cgest().ident)
+                    update(definicoes[2], 'alunos', 'email', '"{}"'.format(values['-Email-'].strip().capitalize()) if values['-Email-'] else '"Nada"', 'ID', Cgest().ident)
+                    update(definicoes[2], 'alunos', 'morada', '"{}"'.format(values['-Morada-'].strip().title()) if values['-Morada-'] else '"Nada"', 'ID', Cgest().ident)
+                    update(definicoes[2], 'alunos', 'sexo', '"Masculino"' if values['-SEX1-'] else '"Feminino"', 'ID', Cgest().ident)
+                    update(definicoes[2], 'alunos', 'detalhes', '"{}"'.format(values['-Detalhe-']), 'ID', Cgest().ident)
+                    update(definicoes[2], 'alunos', 'foto', r'"{}"'.format(self.image), 'ID', Cgest().ident)
+                    try:    
+                        update(definicoes[2], 'alunos', 'numero1', int(values['-Num1-'].strip()), 'ID', Cgest().ident)
+                        update(definicoes[2], 'alunos', 'numero2', int(values['-Num2-'].strip()), 'ID', Cgest().ident)
+                    except:
+                        Cgest.message('verifique o número de telefone 1 ou 2 ')
+                    try:    
+                        update(definicoes[2], 'alunos', 'idade', int(values['-Idade-'].strip()), 'ID', Cgest().ident)
+                    except:
+                        Cgest.message('verifique a idade')
+                    dados_dos_alunos = abrir_alunos(definicoes[2])
+                
     class Deficoes:
         def __init__(self):
             self.layout = [
